@@ -1,0 +1,4 @@
+define: (0, 1)
+define: (1, 5)
+change: (0, add: (v: (0), 1))
+if: (less: (0, 1), goto: (3), end)
