@@ -1,4 +1,0 @@
-set num1 3
-set num2 4
-set num3 add get num1 get num2
-print get num3

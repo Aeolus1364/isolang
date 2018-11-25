@@ -1,4 +1,5 @@
 import commands
+import time
 
 
 class Interpreter:
@@ -14,6 +15,8 @@ class Interpreter:
 
         self.list_cmd = open("cmd_list.txt", "r").read().split()  # list of all commands
         self.holder = None  # holds returned values until the next command activates
+        self.active = None
+        self.packet = None
         self.resolve = True
         self.halt = False
 
@@ -30,46 +33,48 @@ class Interpreter:
 
     def step(self):
 
-        packet = self.stream[self.current]  # packet is the current item in the stream
+        self.packet = self.stream[self.current]  # packet is the current item in the stream
         self.current += 1
-        packtype = self.get_type(packet)  # packets can be values or commands
+        packtype = self.get_type(self.packet)  # packets can be values or commands
 
         if self.priority:  # if there is a priority
-            active = self.cmds[self.priority - 1]  # command with that priority set to active
+            self.active = self.cmds[self.priority - 1]  # command with that priority set to active
         else:
-            active = None
+            self.active = None
 
         if packtype == "cmd":
             self.priority += 1  # new command gets 1 higher priority
-            self.cmds.append(self.get_cmd(packet)(self.priority))  # adds new active command
+            self.cmds.append(self.get_cmd(self.packet)(self.priority))  # adds new active command
 
         elif packtype == "val":
-            active.argument(packet)  # sends argument to priority command
+            self.active.argument(self.packet)  # sends argument to priority command
 
         while self.resolve:
-            active = self.cmds[self.priority - 1]
+            self.active = self.cmds[self.priority - 1]
             self.resolve = False
 
-            if self.holder:
-                active.argument(self.holder)
+            if not self.holder is None:
+                self.active.argument(self.holder)
                 self.holder = None
 
-            if active.complete():  # on command completion
-                type = active.return_type  # get return type
-                # passes in requested data to modify
-                if type == "var":  # changing var stream
-                    self.var = active.evaluate(self.var)
-                elif type == "stream":  # changing packet stream
-                    self.stream = active.evaluate(self.stream)
-                elif type == "current":  # changing current packet
-                    self.current = active.evaluate(self.current)
-                elif type == "value":  # returns argument for next command
-                    self.holder = active.evaluate(self.var)
-                    self.resolve = True
-                elif type == "none":
-                    active.evaluate()
-                else:  # error if return type not there or doesn't match
-                    self.raise_error(f"'{active.__class__.__name__}' has an invalid return type: '{active.return_type}'")
+            # if self.active.complete():  # on command completion
+            #     type = self.active.return_type  # get return type
+            #     # passes in requested data to modify
+            #     if type == "var":  # changing var stream
+            #         self.var = self.active.evaluate(self.var)
+            #     elif type == "stream":  # changing packet stream
+            #         self.stream = self.active.evaluate(self.stream)
+            #     elif type == "current":  # changing current packet
+            #         self.current = self.active.evaluate(self.current)
+            #     elif type == "value":  # returns argument for next command
+            #         self.holder = self.active.evaluate(self.var)
+            #         self.resolve = True
+            #     elif type == "none":
+            #         self.active.evaluate()
+            #     else:  # error if return type not there or doesn't match
+            #         self.raise_error(f"'{self.active.__class__.__name__}' has an invalid return type: '{self.active.return_type}'")
+            if self.active.complete():
+                self.holder = self.active.evaluate()
 
                 del self.cmds[self.priority - 1]  # remove command from active
                 self.priority -= 1  # drop priority
@@ -79,14 +84,13 @@ class Interpreter:
         if self.current == len(self.stream):  # stops on last command
             self.halt = True
 
-        # print(self.current, self.var, self.holder)
-        # print(self.current, self.priority, active.__class__.__name__, active.args)
-        # print(self.priority)
-
-
     def loop(self):
         while not self.halt:
             self.step()
+            # input()
+            time.sleep(0.01)
+            # print(self.current, self.packet, self.var, self.holder)
+            # print(self.priority, self.active.__class__.__name__, self.active.args)
 
     def get_type(self, packet):  # evaluates whether a packet is a command or value
         if type(packet) == int:  # all integers are values
@@ -116,7 +120,7 @@ class Interpreter:
         self.halt = True
 
 
-interpreter = Interpreter("commands.txt")
+interpreter = Interpreter("code.txt")
 # interpreter.load(stream, var)
 
 interpreter.loop()
