@@ -1,72 +1,83 @@
 class Command:
-    def __init__(self, num_args):
-        self.num_args = num_args  # number of arguments it takes
+    def __init__(self, interpreter, max_args):
+        self.num_args = 0  # number of arguments it takes
+        self.max_args = max_args
+        if max_args == 0:
+            self.accept_args = False
+        else:
+            self.accept_args = True
         self.args = []  # list of actual arguments of a function
-        self.active = True
+        self.flag = False  # flag turned on every time an arg is added
+        self.completed = False  # command removed from stack if completed
+
+        self.inter = interpreter
 
     def argument(self, arg):
-        self.args.append(arg)
-        self.num_args -= 1
-
-    def complete(self):
-        if self.num_args < 0:
-            print("Error: number of arguments less than zero")
-        return self.num_args == 0
+        if self.accept_args:
+            self.args.append(arg)
+            self.num_args += 1
+            self.flag = True
+        else:
+            print(f"Error: {self.__class__.__name__} command does not accept arguments")
 
 
 class Set(Command):  # sets variable value in var stream
-    def __init__(self):
-        super().__init__(2)
-        # arg 0: var name
-        # arg 1: var value
+    def __init__(self, inter):
+        super().__init__(inter, 2)
 
-    def evaluate(self, inter):
-        inter.var[self.args[0]] = self.args[1]
+    def execute(self):
+        if self.num_args == self.max_args:
+            self.inter.var[self.args[0]] = self.args[1]
+            self.completed = True
 
 
 class Get(Command):  # gets variable value from var stream
-    def __init__(self):
-        super().__init__(1)
-        # arg 0: var name
+    def __init__(self, inter):
+        super().__init__(inter, 1)
 
-    def evaluate(self, inter):
-        return inter.var[self.args[0]]  # returns arg value from var dict
+    def execute(self):
+        if self.num_args == self.max_args:
+            self.completed = True
+            return self.inter.var[self.args[0]]  # returns arg value from var dict
 
 
 class Print(Command):
-    def __init__(self):
-        super().__init__(1)
+    def __init__(self, inter):
+        super().__init__(inter, 1)
         # arg 0: prints value
 
-    def evaluate(self, inter):
-        print(self.args[0])
+    def execute(self):
+        if self.max_args == self.num_args:
+            self.completed = True
 
-
-class Goto(Command):
-    def __init__(self):
-        super().__init__(1)
-
-    def evaluate(self, inter):
-        inter.current = self.args[0]
-
-
-class Add(Command):
-    def __init__(self):
-        super().__init__(2)
-
-    def evaluate(self):
-        return self.args[0] + self.args[1]
-
-    
-class If(Command):
-    def __init__(self):
-        super().__init__(2)
-    
-    def evaluate(self, inter):
-        if (self.args[0] < 0):
-            for c in range(inter.current, len(inter.stream)):
-                if c == "end"
-                
+            print(self.args[0])
+#
+#
+# class Goto(Command):
+#     def __init__(self):
+#         super().__init__(1)
+#
+#     def evaluate(self, inter):
+#         inter.current = self.args[0]
+#
+#
+# class Add(Command):
+#     def __init__(self):
+#         super().__init__(2)
+#
+#     def evaluate(self, inter):
+#         return self.args[0] + self.args[1]
+#
+#
+# class If(Command):
+#     def __init__(self):
+#         super().__init__(2)
+#
+#     def evaluate(self, inter):
+#         if (self.args[0] < 0):
+#             for c in range(inter.current, len(inter.stream)):
+#                 if c == "end"
+#
                 
 class End(Command):
     def __init__(self):
@@ -90,4 +101,3 @@ class Example(Command):  # example command
 
     def evaluate(self, inter):  # modify interpreter values with inter
         pass  # returned values are passed to the next active command
-    

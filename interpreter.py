@@ -1,4 +1,5 @@
 import commands
+import time
 
 
 class Interpreter:
@@ -47,13 +48,15 @@ class Interpreter:
         if self.type == "cmd":
             try:
                 self.stack.append(  # adds command to stack
-                    getattr(commands, self.item.capitalize())()  # command class fetched from string
+                    getattr(commands, self.item.capitalize())(self)  # command class fetched from string
                 )
             except AttributeError:
                 self.raise_error(f"{self.item.capitalize()} is not a command")
 
         elif self.type == "val":
             self.active.argument(self.item)  # value passed into active command
+
+        print(self.item, self.stack)
 
         # resolves all completable commands
         while not self.resolved:
@@ -63,8 +66,9 @@ class Interpreter:
                 self.active.argument(self.holder)  # pass in holder as an argument
                 self.holder = None  # reset holder to None
 
-            if self.active.complete():  # is active command completed?
-                self.holder = self.active.evaluate(self)  # evaluate the command and hold any returned value
+            self.holder = self.active.execute()  # evaluate the command and hold any returned value
+
+            if self.active.completed:  # is command completed?
                 del self.stack[-1]  # remove completed command from the stack
 
             if self.holder is None:

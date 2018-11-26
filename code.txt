@@ -1,2 +1,2 @@
-set .var 1
+set .var .text
 print get .var
