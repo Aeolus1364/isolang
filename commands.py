@@ -76,14 +76,13 @@ class Add(Command):
             return self.args[0] + self.args[1]
 
 
-# class If(Command):
-#     def __init__(self, inter):
-#         super().__init__(inter, 2)
-#
-#     def execute(self, inter):
-#         if (self.args[0] < 0):
-#             for c in range(inter.current, len(inter.stream)):
-#                 if c == "end"
+class If(Command):
+    def __init__(self, inter):
+        super().__init__(inter, -1)
+
+    def execute(self, inter):
+        if self.num_args == 1:
+            pass
 
 
 class Dummy(Command):

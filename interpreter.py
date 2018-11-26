@@ -14,6 +14,7 @@ class Interpreter:
 
         self.halt = False
         self.resolved = False
+        self.stack_empty = False
 
         self.item = None
         self.active = None
@@ -32,58 +33,60 @@ class Interpreter:
         self.stream = load_stream
 
     def step(self):
-        self.item = self.stream[self.current]
-        self.current += 1
+        if self.stream:  # if there is code
+            self.item = self.stream[self.current]
+            self.current += 1
 
-        # determines item type: cmd or val
-        if type(self.item) == int:  # all integers all values
-            self.type = "val"
-        elif self.item[0] == '.':  # . value classifier for non command strings
-            self.type = "val"
-            self.item = self.item[1:]  # removing . value classifier
-        else:
-            self.type = "cmd"
+            # determines item type: cmd or val
+            if type(self.item) == int:  # all integers all values
+                self.type = "val"
+            elif self.item[0] == '.':  # . value classifier for non command strings
+                self.type = "val"
+                self.item = self.item[1:]  # removing . value classifier
+            else:
+                self.type = "cmd"
 
-        # action taken based on item type
-        if self.type == "cmd":
-            try:
-                self.stack.append(  # adds command to stack
-                    getattr(commands, self.item.capitalize())(self)  # command class fetched from string
-                )
-            except AttributeError:
-                self.raise_error(f"{self.item.capitalize()} is not a command")
+            # action taken based on item type
+            if self.type == "cmd":
+                try:
+                    self.stack.append(  # adds command to stack
+                        getattr(commands, self.item.capitalize())(self)  # command class fetched from string
+                    )
+                except AttributeError:
+                    self.raise_error(f"{self.item.capitalize()} is not a command")
 
-        elif self.type == "val":
-            self.active.argument(self.item)  # value passed into active command
+            elif self.type == "val":
+                if self.stack:  # if there is an active command
+                    self.active.argument(self.item)  # value passed into active command
+                else:  # skip command resolution if stack is empty
+                    self.resolved = True
 
-        # print(self.item, self.stack)
+            # resolves all completable commands
+            while not self.resolved:
+                self.active = self.stack[-1]  # active command is the top of the stack
 
-        # resolves all completable commands
-        while not self.resolved:
-            self.active = self.stack[-1]  # active command is the top of the stack
+                if self.holder is not None:  # if the holder contains a value
+                    self.active.argument(self.holder)  # pass in holder as an argument
+                    self.holder = None  # reset holder to None
 
-            if self.holder is not None:  # if the holder contains a value
-                self.active.argument(self.holder)  # pass in holder as an argument
-                self.holder = None  # reset holder to None
+                self.holder = self.active.execute()  # evaluate the command and hold any returned value
 
-            self.holder = self.active.execute()  # evaluate the command and hold any returned value
+                if self.active.completed:  # is command completed?
+                    del self.stack[-1]  # remove completed command from the stack
 
-            if self.active.completed:  # is command completed?
-                del self.stack[-1]  # remove completed command from the stack
+                if self.holder is None:
+                    self.resolved = True  # all actions are resolved, end step
 
-            if self.holder is None:
-                self.resolved = True  # all actions are resolved, end step
+                # print(self.active.__class__.__name__, self.active.args, self.holder)
 
-            # print(self.active.__class__.__name__, self.active.args, self.holder)
+            # print(self.current, self.item, self.var, "\n")
+            # print(self.active.__class__.__name__, self.active.args)
+            # print()
 
-        # print(self.current, self.item, self.var, "\n")
-        # print(self.active.__class__.__name__, self.active.args)
-        # print()
+            self.resolved = False
 
-        self.resolved = False
-
-        if self.current == len(self.stream):  # if last item is reached, end program
-            self.halt = True
+            if self.current == len(self.stream):  # if last item is reached, end program
+                self.halt = True
 
     def loop(self):
         while not self.halt:
