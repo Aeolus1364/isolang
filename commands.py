@@ -62,7 +62,7 @@ class Goto(Command):
         super().__init__(inter, 1)
 
     def execute(self):
-        if self.last:
+        if self.last():
             self.inter.current = self.args[0]
 
 
@@ -72,26 +72,18 @@ class Add(Command):
 
     def execute(self):
         print(self.num_args, self.args, self.max_args)
-        if self.last:
+        if self.last():
             return self.args[0] + self.args[1]
 
-#
+
 # class If(Command):
-#     def __init__(self):
-#         super().__init__(2)
+#     def __init__(self, inter):
+#         super().__init__(inter, 2)
 #
 #     def execute(self, inter):
 #         if (self.args[0] < 0):
 #             for c in range(inter.current, len(inter.stream)):
 #                 if c == "end"
-#
-
-class End(Command):
-    def __init__(self):
-        super().__init__(0)
-
-    def execute(self):
-        return 1
 
 
 class Dummy(Command):
