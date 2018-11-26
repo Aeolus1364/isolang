@@ -1,2 +1,2 @@
-set .var .text
-print get .var
+set .v 1
+print add 1 2

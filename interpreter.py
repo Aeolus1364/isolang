@@ -56,7 +56,7 @@ class Interpreter:
         elif self.type == "val":
             self.active.argument(self.item)  # value passed into active command
 
-        print(self.item, self.stack)
+        # print(self.item, self.stack)
 
         # resolves all completable commands
         while not self.resolved:

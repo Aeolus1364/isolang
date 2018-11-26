@@ -55,29 +55,32 @@ class Print(Command):
     def execute(self):
         if self.last():
             print(self.args[0])
-#
-#
-# class Goto(Command):
-#     def __init__(self):
-#         super().__init__(1)
-#
-#     def evaluate(self, inter):
-#         inter.current = self.args[0]
-#
-#
-# class Add(Command):
-#     def __init__(self):
-#         super().__init__(2)
-#
-#     def evaluate(self, inter):
-#         return self.args[0] + self.args[1]
-#
+
+
+class Goto(Command):
+    def __init__(self, inter):
+        super().__init__(inter, 1)
+
+    def execute(self):
+        if self.last:
+            self.inter.current = self.args[0]
+
+
+class Add(Command):
+    def __init__(self, inter):
+        super().__init__(inter, 2)
+
+    def execute(self):
+        print(self.num_args, self.args, self.max_args)
+        if self.last:
+            return self.args[0] + self.args[1]
+
 #
 # class If(Command):
 #     def __init__(self):
 #         super().__init__(2)
 #
-#     def evaluate(self, inter):
+#     def execute(self, inter):
 #         if (self.args[0] < 0):
 #             for c in range(inter.current, len(inter.stream)):
 #                 if c == "end"
@@ -87,21 +90,21 @@ class End(Command):
     def __init__(self):
         super().__init__(0)
 
-    def evaluate(self):
+    def execute(self):
         return 1
 
 
 class Dummy(Command):
-    def __init__(self):
-        super().__init__(0)
+    def __init__(self, inter):
+        super().__init__(inter, 0)
 
-    def evaluate(self):
+    def execute(self):
         pass
 
 
 class Example(Command):  # example command
-    def __init__(self):
-        super().__init__(0)  # number of args passed in
+    def __init__(self, inter):
+        super().__init__(inter, 0)  # number of args passed in
 
-    def evaluate(self, inter):  # modify interpreter values with inter
+    def execute(self):  # modify interpreter values with inter
         pass  # returned values are passed to the next active command
