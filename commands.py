@@ -57,10 +57,37 @@ class Add(Command):
     def evaluate(self):
         return self.args[0] + self.args[1]
 
-
+    
+class If(Command):
+    def __init__(self):
+        super().__init__(2)
+    
+    def evaluate(self, inter):
+        if (self.args[0] < 0):
+            for c in range(inter.current, len(inter.stream)):
+                if c == "end"
+                
+                
+class End(Command):
+    def __init__(self):
+        super().__init__(0)
+        
+    def evaluate(self):
+        return 1            
+          
+        
+class Dummy(Command):
+    def __init__(self):
+        super().__init__(0)
+        
+    def evaluate(self):
+        pass
+    
+    
 class Example(Command):  # example command
     def __init__(self):
         super().__init__(0)  # number of args passed in
 
     def evaluate(self, inter):  # modify interpreter values with inter
         pass  # returned values are passed to the next active command
+    
