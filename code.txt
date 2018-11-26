@@ -1,1 +1,2 @@
-print 3
+set .var 1
+print get .var

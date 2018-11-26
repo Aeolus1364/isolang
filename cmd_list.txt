@@ -1,5 +1,0 @@
-set
-get
-print
-goto
-add

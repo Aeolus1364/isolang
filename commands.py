@@ -1,7 +1,6 @@
 class Command:
-    def __init__(self, num_args, priority):
+    def __init__(self, num_args):
         self.num_args = num_args  # number of arguments it takes
-        self.priority = priority  # priority level of a command
         self.args = []  # list of actual arguments of a function
         self.active = True
 
@@ -16,8 +15,8 @@ class Command:
 
 
 class Set(Command):  # sets variable value in var stream
-    def __init__(self, priority):
-        super().__init__(2, priority)
+    def __init__(self):
+        super().__init__(2)
         # arg 0: var name
         # arg 1: var value
 
@@ -26,20 +25,20 @@ class Set(Command):  # sets variable value in var stream
 
 
 class Get(Command):  # gets variable value from var stream
-    def __init__(self, priority):
-        super().__init__(1, priority)
+    def __init__(self):
+        super().__init__(1)
         # arg 0: var name
 
-    def evaluate(self, var):
-        return var[self.args[0]]  # returns arg value from var dict
+    def evaluate(self, inter):
+        return inter.var[self.args[0]]  # returns arg value from var dict
 
 
 class Print(Command):
-    def __init__(self, priority):
-        super().__init__(1, priority)
+    def __init__(self):
+        super().__init__(1)
         # arg 0: prints value
 
-    def evaluate(self):
+    def evaluate(self, inter):
         print(self.args[0])
 #
 #
