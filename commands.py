@@ -40,27 +40,27 @@ class Print(Command):
 
     def evaluate(self, inter):
         print(self.args[0])
-#
-#
-# class Goto(Command):
-#     def __init__(self, priority):
-#         super().__init__(1, priority, "current")
-#
-#     def evaluate(self, current):
-#         return self.args[0]
-#
-#
-# class Add(Command):
-#     def __init__(self, priority):
-#         super().__init__(2, priority, "value")
-#
-#     def evaluate(self, var):
-#         return self.args[0] + self.args[1]
-#
-#
-# class Default(Command):
-#     def __init__(self, priority):
-#         super().__init__(0, priority, "")
-#
-#     def evaluate(self):
-#         pass
+
+
+class Goto(Command):
+    def __init__(self):
+        super().__init__(1)
+
+    def evaluate(self, inter):
+        inter.current = self.args[0]
+
+
+class Add(Command):
+    def __init__(self):
+        super().__init__(2)
+
+    def evaluate(self):
+        return self.args[0] + self.args[1]
+
+
+class Example(Command):  # example command
+    def __init__(self):
+        super().__init__(0)  # number of args passed in
+
+    def evaluate(self, inter):  # modify interpreter values with inter
+        pass  # returned values are passed to the next active command
