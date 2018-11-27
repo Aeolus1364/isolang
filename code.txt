@@ -1,3 +1,19 @@
-print 0
-0
-goto 0
+set .c 0
+set .i 1
+
+set .c
+    add
+        get .c
+        get .i
+
+if
+    add
+        get .c
+        -5
+
+    print .done
+
+else
+    print get .c
+    goto 6
+end

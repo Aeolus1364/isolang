@@ -14,7 +14,6 @@ class Interpreter:
 
         self.halt = False
         self.resolved = False
-        self.stack_empty = False
 
         self.item = None
         self.active = None
@@ -26,7 +25,12 @@ class Interpreter:
         with open(file, "r") as f:  # opens file
             text = f.read()
             for w in text.split():  # iterates through all words in text
-                if w.isdigit():  # if string is a valid int, converted
+                try:  # determines if item is a integer
+                    int(w)
+                    is_int = True
+                except ValueError:
+                    is_int = False
+                if is_int:  # if string is a valid int, converted
                     load_stream.append(int(w))
                 else:  # otherwise kept the same
                     load_stream.append(w)
@@ -79,8 +83,8 @@ class Interpreter:
 
                 # print(self.active.__class__.__name__, self.active.args, self.holder)
 
-            # print(self.current, self.item, self.var, "\n")
-            # print(self.active.__class__.__name__, self.active.args)
+            # print(self.current, self.item, self.var)
+            # print(self.active.__class__.__name__, self.active.args, self.stack)
             # print()
 
             self.resolved = False
