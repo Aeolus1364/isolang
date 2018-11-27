@@ -75,6 +75,24 @@ class Add(Command):
             return self.args[0] + self.args[1]
 
 
+class Less(Command):
+    def __init__(self, inter):
+        super().__init__(inter, 2)
+
+    def execute(self):
+        if self.last():
+            return self.args[0] < self.args[1]
+
+
+class More(Command):
+    def __init__(self, inter):
+        super().__init__(inter, 2)
+
+    def execute(self):
+        if self.last():
+            return self.args[0] > self.args[1]
+
+
 class If(Command):
     def __init__(self, inter):
         super().__init__(inter, -1)
