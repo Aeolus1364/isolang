@@ -1,6 +1,10 @@
 set .c 0
+
 set .c add get .c 1
-if less get .c 11
-print .hola.wikipedia
+
+if more get .c 10
+print .done
+else
+print get .c
 goto 3
 end

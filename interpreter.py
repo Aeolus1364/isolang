@@ -3,14 +3,12 @@ import time
 
 
 class Interpreter:
-    def __init__(self, file):
+    def __init__(self):
         self.current = 0
 
         self.stream = []  # stream of packets
         self.var = {}
         self.stack = []  # commands in effect, most recent is active
-
-        self.load(file)
 
         self.halt = False
         self.resolved = False
@@ -20,7 +18,21 @@ class Interpreter:
         self.type = None
         self.holder = None
 
-    def load(self, file):
+    def load(self, text):  # load code from string
+        load_stream = []
+        for w in text.split():  # iterates through all words in text
+            try:  # determines if item is a integer
+                int(w)
+                is_int = True
+            except ValueError:
+                is_int = False
+            if is_int:  # if string is a valid int, converted
+                load_stream.append(int(w))
+            else:  # otherwise kept the same
+                load_stream.append(w)
+        self.stream = load_stream
+
+    def load_file(self, file):  # load code from file
         load_stream = []
         with open(file, "r") as f:  # opens file
             text = f.read()
@@ -95,11 +107,12 @@ class Interpreter:
     def loop(self):
         while not self.halt:
             self.step()
+            time.sleep(0.01)
 
     def raise_error(self, error):
         print("Error: " + error)
         self.halt = True
 
-
-interpreter = Interpreter("code.txt")
-interpreter.loop()
+# i = Interpreter()
+# i.load_file("code.txt")
+# i.loop()

@@ -75,6 +75,33 @@ class Add(Command):
             return self.args[0] + self.args[1]
 
 
+class Sub(Command):
+    def __init__(self, inter):
+        super().__init__(inter, 2)
+
+    def execute(self):
+        if self.last():
+            return self.args[0] - self.args[1]
+
+
+class Mult(Command):
+    def __init__(self, inter):
+        super().__init__(inter, 2)
+
+    def execute(self):
+        if self.last():
+            return round(self.args[0] * self.args[1])
+
+
+class Div(Command):
+    def __init__(self, inter):
+        super().__init__(inter, 2)
+
+    def execute(self):
+        if self.last():
+            return round(self.args[0] / self.args[1])
+
+
 class Less(Command):
     def __init__(self, inter):
         super().__init__(inter, 2)
@@ -150,6 +177,22 @@ class Else(Command):
     def execute(self):
         self.completed = True
         return 1
+
+
+class Input(Command):
+    def __init__(self, inter):
+        super().__init__(inter, 0)
+
+    def execute(self):
+        self.completed = True
+        i = input()
+
+        try:  # determines if item is a integer
+            i = int(i)
+        except ValueError:
+            pass
+
+        return i
 
 
 class Dummy(Command):
